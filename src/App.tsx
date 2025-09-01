@@ -1,35 +1,44 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+import { useEffect, useState } from 'react';
+import { PlayGrid } from './components/PlayGrid';
 import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0);
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  );
+type Team = 'offense' | 'defense';
+interface Player {
+  id: string;
+  team: Team;
+  role: string;
+  x: number;
+  y: number;
 }
 
-export default App;
+interface PlayData {
+  name: string;
+  frames: Player[][];
+}
+
+export default function App() {
+  const [play, setPlay] = useState<PlayData | null>(null);
+  const [frameIndex, setFrameIndex] = useState(0);
+
+  useEffect(() => {
+    fetch('/api/plays/current')
+      .then(r => r.json())
+      .then(setPlay);
+  }, []);
+
+  useEffect(() => {
+    if (!play) return;
+    const t = setInterval(() => {
+      setFrameIndex(i => (i + 1) % play.frames.length);
+    }, 1000);
+    return () => clearInterval(t);
+  }, [play]);
+
+  if (!play) return <div>Loading play…</div>;
+  return (
+    <div>
+      <h1 style={{ textAlign: 'center' }}>{play.name}</h1>
+      <PlayGrid players={play.frames[frameIndex]} />
+    </div>
+  );
+}
