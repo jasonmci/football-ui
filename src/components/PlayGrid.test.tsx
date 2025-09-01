@@ -3,8 +3,8 @@ import '@testing-library/jest-dom';
 import { PlayGrid } from './PlayGrid';
 
 const mockPlayers = [
-  { id: 'QB', team: "offense" as "offense", role: 'QB', x: 4, y: 18 },
-  { id: 'CB1', team: "defense" as "defense", role: 'CB', x: 1, y: 13 },
+  { id: 'QB', team: "offense" as const, role: 'QB', x: 4, y: 18 },
+  { id: 'CB1', team: "defense" as const, role: 'CB', x: 1, y: 13 },
 ];
 
 describe('PlayGrid', () => {
